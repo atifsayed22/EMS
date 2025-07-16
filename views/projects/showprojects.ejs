@@ -1,0 +1,107 @@
+<% layout('layout/boilerplate2') %>
+<style>
+    .horizontal-scroll-wrapper {
+  display: flex;
+  overflow-x: auto;
+  padding-bottom: 1rem;
+  gap: 1rem;
+  scroll-behavior: smooth;
+}
+
+.horizontal-scroll-wrapper::-webkit-scrollbar {
+  height: 6px;
+}
+.horizontal-scroll-wrapper::-webkit-scrollbar-thumb {
+  background-color: rgba(0,0,0,0.1);
+  border-radius: 10px;
+}
+
+.project-card {
+  min-width: 300px;
+  flex: 0 0 auto;
+}
+
+/* Optional: Prevent full-page horizontal scroll */
+body {
+  overflow-x: hidden;
+}
+
+</style>
+<div class="container mt-5">
+
+  <div class="d-flex  mb-4">
+    <a href="/projects/add" class="btn btn-success">
+      <i class="fas fa-plus-circle me-2"></i> Add New Project
+    </a>
+  </div>
+  
+
+  <% const groupedProjects = {
+    Pending: [],
+    Ongoing: [],
+    Completed: []
+  }; %>
+
+  <% projects.forEach(project => {
+    groupedProjects[project.status]?.push(project);
+  }); %>
+
+  <% Object.entries(groupedProjects).forEach(([status, projectsByStatus]) => { %>
+    <div class="mb-5">
+      <h4 class="mb-3 border-bottom pb-1 text-<%= 
+        status === 'Pending' ? 'secondary' : 
+        status === 'Ongoing' ? 'warning' : 
+        'success' 
+      %>">
+        <i class="fas fa-circle me-2" style="font-size: 10px; vertical-align: middle;"></i> <%= status %> Projects
+      </h4>
+
+      <% if (projectsByStatus.length === 0) { %>
+        <p class="text-muted">No <%= status.toLowerCase() %> projects.</p>
+      <% } else { %>
+       <div class="overflow-auto pb-2">
+        <div class="horizontal-scroll-wrapper">
+            <% projectsByStatus.forEach(project => { %>
+              <div class="card project-card shadow-sm border-0 me-3">
+                <div class="card-body">
+                  <!-- Card Content Here -->
+                  <h5 class="card-title text-primary">
+                    <i class="fas fa-folder-open me-2"></i> <%= project.title %>
+                  </h5>
+                  <p class="card-text small text-muted"><%= project.description || 'No description available.' %></p>
+          
+                  <span class="badge 
+                    <%= status === 'Completed' ? 'bg-success' : 
+                        status === 'Ongoing' ? 'bg-warning text-dark' : 
+                        'bg-secondary' %>">
+                    <%= status %>
+                  </span>
+          
+                  <hr>
+          
+                  <p class="mb-1"><strong>Team Leader:</strong> 
+                    <%= project.leader?.firstName %> <%= project.leader?.lastName %>
+                  </p>
+          
+                  <p class="mb-1"><strong>Team:</strong> 
+                    <%= project.teamMembers?.length 
+                      ? project.teamMembers.map(m => `${m.firstName} ${m.lastName}`).join(', ')
+                      : 'None' %>
+                  </p>
+          
+                  <p class="mb-0"><strong>Duration:</strong> 
+                    <%= project.startDate ? new Date(project.startDate).toDateString() : 'N/A' %> 
+                    – 
+                    <%= project.endDate ? new Date(project.endDate).toDateString() : 'N/A' %>
+                  </p>
+                </div>
+              </div>
+            <% }) %>
+          </div>
+          
+</div>
+
+      <% } %>
+    </div>
+  <% }) %>
+</div>

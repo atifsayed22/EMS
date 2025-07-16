@@ -1,0 +1,73 @@
+<% layout('layout/boilerplate2') %>
+
+<div class="container px-4">
+  <div class="my-4 d-flex justify-content-between align-items-center">
+    <h2>Employee Details</h2>
+    <a href="/dashboard/employees" class="btn btn-outline-secondary">
+      <i class="fas fa-arrow-left me-1"></i> Back to Directory
+    </a>
+  </div>
+
+  <div class="card shadow-sm border-0 rounded-4 p-4">
+    <div class="row g-4 align-items-center">
+      <!-- Profile Image -->
+      <div class="col-md-4 text-center">
+        <img
+          src="<%= employee.profileImage || '/img/default-avatar.png' %>"
+          alt="Profile Image"
+          class="rounded-circle shadow"
+          style="width: 150px; height: 150px; object-fit: cover;"
+        />
+        <h4 class="mt-3 mb-0"><%= employee.firstName %> <%= employee.lastName %></h4>
+        <p class="text-muted"><%= employee.role %></p>
+        <span class="badge bg-<%= employee.status === 'Active' ? 'success' : employee.status === 'Fired' ? 'danger' : 'warning text-dark' %>">
+          <%= employee.status %>
+        </span>
+      </div>
+
+      <!-- Employee Info -->
+      <div class="col-md-8">
+        <div class="row">
+          <div class="col-md-6 mb-3">
+            <strong>Email:</strong>
+            <p><%= employee.email %></p>
+          </div>
+          <div class="col-md-6 mb-3">
+            <strong>Mobile:</strong>
+            <p><%= employee.mobile %></p>
+          </div>
+          <div class="col-md-6 mb-3">
+            <strong>Department:</strong>
+            <p><%= employee.department %></p>
+          </div>
+          <div class="col-md-6 mb-3">
+            <strong>Date of Joining:</strong>
+            <p><%= new Date(employee.dateOfJoining).toLocaleDateString() %></p>
+          </div>
+          <div class="col-md-6 mb-3">
+            <strong>Salary:</strong>
+            <p>₹<%= employee.salary.toLocaleString() %></p>
+          </div>
+          <div class="col-md-6 mb-3">
+            <strong>Promoted:</strong>
+            <p><%= employee.isPromoted ? "Yes" : "No" %></p>
+          </div>
+          <div class="col-md-6 mb-3">
+            <strong>Salary Paid:</strong>
+            <p><%= employee.salaryPaid ? "Paid" : "Pending" %></p>
+          </div>
+          <div class="col-md-6 mb-3">
+            <strong>CV:</strong><br>
+            <% if (employee.cvFile) { %>
+              <a href="<%= employee.cvFile %>" target="_blank" class="btn btn-outline-primary btn-sm">
+                <i class="fas fa-file-alt me-1"></i> View CV
+              </a>
+            <% } else { %>
+              <span class="text-muted">No CV uploaded</span>
+            <% } %>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

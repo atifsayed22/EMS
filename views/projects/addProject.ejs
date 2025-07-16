@@ -1,0 +1,102 @@
+<% layout('layout/boilerplate2') %>
+
+<% if (success && success.length) { %>
+    <div class="alert alert-success alert-dismissible fade show" role="alert">
+      <%= success %>
+      <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+  <% } %>
+  <% if (error && error.length) { %>
+    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+      <%= error %>
+      <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+  <% } %>
+<form action="/projects/add" method="POST" class="container mt-5 p-4 bg-white shadow rounded" style="max-width: 800px;">
+    <h3 class="mb-4 text-center text-primary">Create New Project</h3>
+  
+    <!-- Project Title -->
+    <div class="mb-3">
+      <label class="form-label">Project Title *</label>
+      <input type="text" class="form-control" name="title" placeholder="Enter project title" required>
+    </div>
+  
+    <!-- Description -->
+    <div class="mb-3">
+      <label class="form-label">Project Description</label>
+      <textarea class="form-control" name="description" rows="3" placeholder="Describe the project..."></textarea>
+    </div>
+  
+    <!-- Status -->
+    <div class="mb-3">
+      <label class="form-label">Project Status</label>
+      <select class="form-select" name="status">
+        <option value="Pending">Pending</option>
+        <option value="Ongoing">Ongoing</option>
+        <option value="Completed">Completed</option>
+      </select>
+    </div>
+  
+    <!-- Team Leader -->
+    <div class="mb-3">
+        <label class="form-label d-block">Select Team Leader</label>
+        <div class="row row-cols-1 row-cols-md-2 g-3">
+          <% employees.forEach(emp => { %>
+            <div class="col">
+              <label class="card p-2 shadow-sm" style="cursor: pointer;">
+                <div class="d-flex align-items-center">
+                  <img src="<%= emp.profileImage || '/default-avatar.png' %>" class="rounded-circle me-3" width="50" height="50" alt="Profile">
+                  <div class="flex-grow-1">
+                    <h6 class="mb-0"><%= emp.firstName %> <%= emp.lastName %></h6>
+                    <small class="text-muted"><%= emp.role %> - <%= emp.department %></small>
+                  </div>
+                  <input type="radio" name="leader" value="<%= emp._id %>" class="form-check-input ms-2" required>
+                </div>
+              </label>
+            </div>
+          <% }) %>
+        </div>
+      </div>
+      
+    <!-- Team Members -->
+    <div class="mb-3">
+        <label class="form-label d-block">Select Team Members</label>
+        <div class="row row-cols-1 row-cols-md-2 g-3">
+          <% employees.forEach(emp => { %>
+            <div class="col">
+              <div class="card p-2 shadow-sm">
+                <label class="d-flex align-items-center" style="cursor: pointer;">
+                  <input type="checkbox" name="teamMembers" value="<%= emp._id %>" class="form-check-input me-3">
+                  <img src="<%= emp.profileImage || '/default-avatar.png' %>" class="rounded-circle me-3" width="50" height="50" alt="Profile">
+                  <div>
+                    <h6 class="mb-0"><%= emp.firstName %> <%= emp.lastName %></h6>
+                    <small class="text-muted"><%= emp.role %> - <%= emp.department %></small>
+                  </div>
+                </label>
+              </div>
+            </div>
+          <% }) %>
+        </div>
+      </div>
+      
+  
+    <!-- Dates -->
+    <div class="row mb-3">
+      <div class="col-md-6">
+        <label class="form-label">Start Date</label>
+        <input type="date" class="form-control" name="startDate">
+      </div>
+      <div class="col-md-6">
+        <label class="form-label">End Date</label>
+        <input type="date" class="form-control" name="endDate">
+      </div>
+    </div>
+  
+    <!-- Submit Button -->
+    <div class="d-flex justify-content-end">
+      <button type="submit" class="btn btn-primary px-4">
+        <i class="fas fa-plus-circle me-2"></i> Create Project
+      </button>
+    </div>
+  </form>
+  

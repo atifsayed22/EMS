@@ -1,0 +1,187 @@
+<% layout('layout/boilerplate2') %>
+
+<div class="container-fluid px-4 py-3">
+  <!-- Header with Stats -->
+  <div class="d-flex flex-column flex-md-row justify-content-between align-items-start align-items-md-center mb-4 gap-3">
+    <div>
+      <h3 class="mb-1">Employee Directory</h3>
+      <p class="text-muted mb-0"><%= employees.length %> employees • <%= activeCount || employees.filter(e => e.status === 'Active').length %> active</p>
+    </div>
+
+    <div class="d-flex gap-2">
+      <form class="d-flex" method="GET" action="/dashboard/employees/search" style="min-width: 250px;">
+        <div class="input-group input-group-sm">
+          <input type="text"  id="employeeSearch" class="form-control form-control-sm" placeholder="Search employees..." name="q" value="<%= query || '' %>">
+          <button class="btn btn-outline-secondary" type="submit">
+            <i class="fas fa-search"></i>
+          </button>
+        </div>
+      </form>
+      <a href="/dashboard/employees/new" class="btn btn-sm btn-primary">
+        <i class="fas fa-plus me-1"></i> Add Employee
+      </a>
+    </div>
+  </div>
+
+  <!-- Flash Messages -->
+  <% if (success && success.length) { %>
+    <div class="alert alert-success alert-dismissible fade show mb-4" role="alert">
+      <div class="d-flex align-items-center">
+        <i class="fas fa-check-circle me-2"></i>
+        <div><%= success %></div>
+      </div>
+      <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+  <% } %>
+  <% if (error && error.length) { %>
+    <div class="alert alert-danger alert-dismissible fade show mb-4" role="alert">
+      <div class="d-flex align-items-center">
+        <i class="fas fa-exclamation-circle me-2"></i>
+        <div><%= error %></div>
+      </div>
+      <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+  <% } %>
+  <!-- Employee Table -->
+<div class="table-responsive">
+  <table class="table table-hover align-middle">
+    <thead class="table-light">
+      <tr>
+        <th>Name</th>
+        <th>Department</th>
+        <th>Role</th>
+        <th>Status</th>
+        <th>Joined</th>
+        <th>Actions</th>
+      </tr>
+    </thead>
+    <tbody  id="employeeTableBody >
+      <% employees.forEach(emp => { %>
+        <tr>
+          <td>
+            <div class="d-flex align-items-center">
+              <img src="<%= emp.profileImage || '/img/default-avatar.png' %>" 
+                   class="rounded-circle me-2" 
+                   width="36" height="36"
+                   style="object-fit: cover;">
+              <div>
+                <div class="fw-bold"><%= emp.firstName %> <%= emp.lastName %></div>
+                <small class="text-muted"><%= emp.email %></small>
+              </div>
+            </div>
+          </td>
+          <td><span class="badge bg-light text-dark"><%= emp.department %></span></td>
+          <td><%= emp.role %></td>
+          <td>
+            <span class="badge bg-<%= emp.status === 'Active' ? 'success' : emp.status === 'Fired' ? 'danger' : 'warning text-dark' %>">
+              <%= emp.status %>
+            </span>
+          </td>
+          <td><%= new Date(emp.dateOfJoining).toLocaleDateString('en-US', {month: 'short', day: 'numeric', year: 'numeric'}) %></td>
+          <td>
+            <div class="d-flex gap-2">
+              <a href="/dashboard/employees/<%= emp._id %>" class="btn btn-sm btn-outline-primary" title="View">
+                <i class="fas fa-eye"></i>
+              </a>
+              <a href="/dashboard/employees/<%= emp._id %>/edit" class="btn btn-sm btn-outline-secondary" title="Edit">
+                <i class="fas fa-edit"></i>
+              </a>
+            </div>
+          </td>
+        </tr>
+      <% }) %>
+    </tbody>
+  </table>
+</div>
+
+
+  <!-- Pagination -->
+  <% if (totalPages > 1) { %>
+    <nav class="mt-4">
+      <ul class="pagination justify-content-center">
+        <% if (currentPage > 1) { %>
+          <li class="page-item">
+            <a class="page-link" href="?page=<%= currentPage - 1 %><%= query ? `&q=${query}` : '' %>" aria-label="Previous">
+              <span aria-hidden="true">&laquo;</span>
+            </a>
+          </li>
+        <% } %>
+
+        <% for (let i = 1; i <= totalPages; i++) { %>
+          <li class="page-item <%= currentPage === i ? 'active' : '' %>">
+            <a class="page-link" href="?page=<%= i %><%= query ? `&q=${query}` : '' %>"><%= i %></a>
+          </li>
+        <% } %>
+
+        <% if (currentPage < totalPages) { %>
+          <li class="page-item">
+            <a class="page-link" href="?page=<%= currentPage + 1 %><%= query ? `&q=${query}` : '' %>" aria-label="Next">
+              <span aria-hidden="true">&raquo;</span>
+            </a>
+          </li>
+        <% } %>
+      </ul>
+    </nav>
+  <% } %>
+</div>
+
+<style>
+  .card:hover {
+    background-color: #f8f9fa;
+    transition: background-color 0.2s ease;
+  }
+  @media (max-width: 767.98px) {
+    .btn-sm {
+      font-size: 0.75rem;
+    }
+    .badge {
+      font-size: 0.7rem;
+    }
+  }
+</style>
+<script>
+  const searchInput = document.getElementById('employeeSearch');
+  const tableBody = document.getElementById('employeeTableBody');
+
+  searchInput.addEventListener('keyup', async () => {
+    const query = searchInput.value.trim();
+
+    const res = await fetch(`/dashboard/employees/live-search?q=${encodeURIComponent(query)}`);
+    const employees = await res.json();
+
+    tableBody.innerHTML = employees.map(emp => `
+      <tr>
+        <td>
+          <div class="d-flex align-items-center">
+            <img src="${emp.profileImage || '/img/default-avatar.png'}"
+                 class="rounded-circle me-2"
+                 width="36" height="36" style="object-fit: cover;">
+            <div>
+              <div class="fw-bold">${emp.firstName} ${emp.lastName}</div>
+              <small class="text-muted">${emp.email}</small>
+            </div>
+          </div>
+        </td>
+        <td><span class="badge bg-light text-dark">${emp.department}</span></td>
+        <td>${emp.role}</td>
+        <td>
+          <span class="badge bg-${emp.status === 'Active' ? 'success' : emp.status === 'Fired' ? 'danger' : 'warning text-dark'}">
+            ${emp.status}
+          </span>
+        </td>
+        <td>${new Date(emp.dateOfJoining).toLocaleDateString('en-US', {month: 'short', day: 'numeric', year: 'numeric'})}</td>
+        <td>
+          <div class="d-flex gap-2">
+            <a href="/dashboard/employees/${emp._id}" class="btn btn-sm btn-outline-primary" title="View">
+              <i class="fas fa-eye"></i>
+            </a>
+            <a href="/dashboard/employees/${emp._id}/edit" class="btn btn-sm btn-outline-secondary" title="Edit">
+              <i class="fas fa-edit"></i>
+            </a>
+          </div>
+        </td>
+      </tr>
+    `).join('');
+  });
+</script>
+

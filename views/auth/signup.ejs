@@ -1,0 +1,51 @@
+<% layout('layout/boilerplate') %>
+
+<div class="d-flex justify-content-center align-items-center" style="min-height: 100vh; background: #f5f6fa;">
+  <div class="card shadow-lg border-0 p-4 rounded-4" style="max-width: 540px; width: 100%;">
+    
+    <div class="text-center mb-4">
+      <img src="https://cdn-icons-png.flaticon.com/512/9131/9131529.png" alt="admin-icon" style="width: 70px;" />
+      <h3 class="mt-3 fw-bold text-dark">Admin Registration</h3>
+      <p class="text-muted">Create your admin account to manage your company</p>
+    </div>
+
+    <form action="/signup" method="POST">
+      <div class="row">
+        <div class="col-md-6 mb-3">
+          <label class="form-label">First Name</label>
+          <input name="firstName" class="form-control form-control-lg" placeholder="John" required>
+        </div>
+        <div class="col-md-6 mb-3">
+          <label class="form-label">Last Name</label>
+          <input name="lastName" class="form-control form-control-lg" placeholder="Doe" required>
+        </div>
+      </div>
+
+      <div class="mb-3">
+        <label class="form-label">Username</label>
+        <input name="username" class="form-control form-control-lg" placeholder="john123" required>
+      </div>
+
+      <div class="mb-3">
+        <label class="form-label">Email Address</label>
+        <input type="email" name="email" class="form-control form-control-lg" placeholder="john@example.com" required>
+      </div>
+
+      <div class="mb-3">
+        <label class="form-label">Mobile Number</label>
+        <input type="text" name="mobile" class="form-control form-control-lg" placeholder="9876543210" required>
+      </div>
+
+      <div class="mb-3">
+        <label class="form-label">Password</label>
+        <input type="password" name="password" class="form-control form-control-lg" placeholder="Enter a strong password" required>
+      </div>
+
+      <button type="submit" class="btn btn-success w-100 btn-lg mt-3 shadow-sm">Register</button>
+
+      <p class="text-center mt-4 mb-0">
+        Already have an account? <a href="/login" class="text-decoration-none fw-semibold">Log in here</a>
+      </p>
+    </form>
+  </div>
+</div>

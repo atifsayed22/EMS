@@ -1,0 +1,160 @@
+<% layout('layout/boilerplate2') %>
+
+<div class="container-fluid px-4">
+  <!-- Header -->
+  <div class="d-flex justify-content-between align-items-center my-4">
+    <h2 class="mb-0">📊 Reports Dashboard</h2>
+  </div>
+
+  <!-- KPI Cards -->
+  <div class="row g-3 mb-4">
+    <div class="col-md-3">
+      <div class="card shadow border-0 text-white rounded-4" style="background: linear-gradient(135deg, #667eea, #764ba2);">
+        <div class="card-body">
+          <h6>Total Employees</h6>
+          <h3><%= totalEmployees %></h3>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-3">
+      <div class="card shadow border-0 text-white rounded-4" style="background: linear-gradient(135deg, #42e695, #3bb2b8);">
+        <div class="card-body">
+          <h6>Active Employees</h6>
+          <h3><%= activeCount %></h3>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-3">
+      <div class="card shadow border-0 text-white rounded-4" style="background: linear-gradient(135deg, #f7971e, #ffd200);">
+        <div class="card-body">
+          <h6>Resigned</h6>
+          <h3><%= resignedCount %></h3>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-3">
+      <div class="card shadow border-0 text-white rounded-4" style="background: linear-gradient(135deg, #ff416c, #ff4b2b);">
+        <div class="card-body">
+          <h6>Fired</h6>
+          <h3><%= firedCount %></h3>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Department Distribution Chart -->
+  <div class="row g-4">
+    <div class="col-md-6">
+      <div class="card shadow rounded-4">
+        <div class="card-body">
+          <h5 class="card-title">Department Distribution</h5>
+          <canvas id="deptChart"></canvas>
+        </div>
+      </div>
+    </div>
+
+    <!-- Salary Stats -->
+    <div class="col-md-6">
+      <div class="card shadow rounded-4">
+        <div class="card-body">
+          <h5 class="card-title">Salary Summary</h5>
+          <ul class="list-group list-group-flush">
+            <li class="list-group-item d-flex justify-content-between">
+              <span>Total Salary Budget:</span>
+              <strong>₹<%= totalSalary.toLocaleString('en-IN') %></strong>
+            </li>
+            <li class="list-group-item d-flex justify-content-between">
+              <span>Total Paid:</span>
+              <strong class="text-success">₹<%= employees.filter(e => e.salaryPaid).reduce((sum, e) => sum + e.salary, 0).toLocaleString('en-IN') %></strong>
+            </li>
+            <li class="list-group-item d-flex justify-content-between">
+              <span>Total Unpaid:</span>
+              <strong class="text-danger">₹<%= employees.filter(e => !e.salaryPaid).reduce((sum, e) => sum + e.salary, 0).toLocaleString('en-IN') %></strong>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Recently Joined Employees -->
+  <div class="row mt-4">
+    <div class="col-md-12">
+      <div class="card shadow rounded-4">
+        <div class="card-body">
+          <h5 class="card-title mb-3">Recently Joined Employees</h5>
+          <div class="table-responsive">
+            <table class="table table-hover">
+              <thead>
+                <tr>
+                  <th>Name</th>
+                  <th>Department</th>
+                  <th>Role</th>
+                  <th>Date of Joining</th>
+                </tr>
+              </thead>
+              <tbody>
+                <% recentlyJoined.forEach(emp => { %>
+                  <tr>
+                    <td><%= emp.firstName %> <%= emp.lastName %></td>
+                    <td><%= emp.department %></td>
+                    <td><%= emp.role %></td>
+                    <td><%= new Date(emp.dateOfJoining).toLocaleDateString() %></td>
+                  </tr>
+                <% }) %>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Chart.js Script -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+  
+  // Department Distribution Chart
+  const deptData = {
+    labels: <%- JSON.stringify(Object.keys(departmentCount)) -%> ,
+    counts: <%- JSON.stringify(Object.values(departmentCount)) -%>
+  };
+
+  const deptCtx = document.getElementById('deptChart').getContext('2d');
+  new Chart(deptCtx, {
+    type: 'bar',
+    data: {
+      labels: deptData.labels,
+      datasets: [{
+        label: 'Number of Employees',
+        data: deptData.counts,
+        backgroundColor: [
+          'rgba(54, 162, 235, 0.7)',
+          'rgba(255, 99, 132, 0.7)',
+          'rgba(75, 192, 192, 0.7)',
+          'rgba(255, 206, 86, 0.7)',
+          'rgba(153, 102, 255, 0.7)'
+        ],
+        borderWidth: 1
+      }]
+    },
+    options: {
+      responsive: true,
+      plugins: {
+        legend: {
+          display: false
+        }
+      },
+      scales: {
+        y: {
+          beginAtZero: true,
+          ticks: {
+            precision: 0
+          }
+        }
+      }
+    }
+  });
+
+</script>
